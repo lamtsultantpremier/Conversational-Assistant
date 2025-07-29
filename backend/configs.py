@@ -1,0 +1,16 @@
+from dotenv import dotenv_values
+
+venv = dotenv_values(".env")
+
+DATABASE_NAME = venv.get("DATABASE_NAME")
+DATABASE_USER_NAME = venv.get("DATABASE_USER_NAME")
+DATABASE_PASSWORD = venv.get("DATABASE_PASSWORD")
+DATABASE_PORT = venv.get("DATABASE_PORT")
+DATABASE_HOST = venv.get("DATABASE_HOST")
+
+DATABASE_URL = f"""postgresql+psycopg2://{DATABASE_USER_NAME}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"""
+
+JWT_SECRET = venv.get("JSON_SECRET")
+JWT_ALGORITHM = venv.get("JSON_ALGORITHM")
+
+URL_API_LLM = venv.get("URL_API_LLM")
