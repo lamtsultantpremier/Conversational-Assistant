@@ -1,17 +1,19 @@
+from operator import itemgetter
 from pathlib import Path
 
-from langchain_openai import ChatOpenAI, OpenAIEmbeddings
-from langchain.chains import create_history_aware_retriever
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains import create_retrieval_chain
-from langchain_core.documents import Document
-from langchain_core.runnables import RunnablePassthrough, RunnableLambda
+from langchain.chains.history_aware_retriever import \
+    create_history_aware_retriever
+from langchain.chains.retrieval import create_retrieval_chain
+from langchain.output_parsers import StructuredOutputParser
 from langchain_chroma import Chroma
+from langchain_core.documents import Document
+from langchain_core.runnables import RunnableLambda, RunnablePassthrough
+from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 
 import config
 
-
-model = ChatOpenAI(model="gpt-4o-mini", api_key=config.OPENAI_API_KEY)
+model = ChatOpenAI(model="gpt-4o", api_key=config.OPENAI_API_KEY)
 
 
 def format_docs(docs: list[Document]):
@@ -27,11 +29,21 @@ def format_docs(docs: list[Document]):
 
 def get_chain(prompt, parser, retriever):
     return (
-        {"context": retriever | format_docs, "question": RunnablePassthrough()}
-        | RunnablePassthrough()
+        RunnablePassthrough()
+        | {"context": retriever | format_docs, "question": RunnablePassthrough()}
         | prompt
         | model
         | parser
+    )
+
+
+def get_chain2(prompt, retriever):
+    return (
+        RunnablePassthrough()
+        | {"context": retriever | format_docs, "question": itemgetter("input")}
+        | prompt
+        | model
+        | StructuredOutputParser()
     )
 
 
