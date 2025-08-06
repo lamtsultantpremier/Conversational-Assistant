@@ -4,7 +4,6 @@ from typing import Annotated, List
 
 from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
-
 from langchain_core.output_parsers.string import StrOutputParser
 
 import config
@@ -12,12 +11,8 @@ from src import schemas
 from src.chain import get_chain, retrieval_chain, vectorstore
 from src.crud import link_crud
 from src.database import Base, DbSession, engine
-from src.prompts import (
-    chat_prompt,
-    prompt_get_answer,
-    prompt_search_query,
-    document_prompt,
-)
+from src.prompts import (chat_prompt, document_prompt, prompt_get_answer,
+                         prompt_search_query)
 
 app = FastAPI()
 
@@ -89,7 +84,7 @@ async def creacte_link(db: DbSession, url: Annotated[schemas.LinkCreate, Query()
 # --------------RAG------------
 
 
-@app.post("/chat_with_history", tags=["RAG Chat with HISTORY "])
+@app.post("/foncier/chats", tags=["RAG Chat with HISTORY "])
 async def rag_with_history(input: schemas.QuestionInput):
     chain = retrieval_chain(
         retriever=vectorstore.as_retriever(),
@@ -100,7 +95,4 @@ async def rag_with_history(input: schemas.QuestionInput):
     response = chain.invoke(
         {"chat_history": input.chat_history, "input": input.question}
     )
-    return {
-        "role": "assistant",
-        "content": response,
-    }
+    return response

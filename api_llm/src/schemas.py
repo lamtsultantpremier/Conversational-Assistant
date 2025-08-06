@@ -15,6 +15,7 @@ class LinkRead(LinkBase):
     class Config:
         from_attributes = True
 
+
 class QuestionInput(BaseModel):
     question: str
-    chat_history: list[dict[str,str]] = [] 
+    chat_history: list[dict[str, str]] = []
