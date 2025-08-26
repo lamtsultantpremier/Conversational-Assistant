@@ -212,3 +212,4 @@ api_llm/documents_pdf
 
 notebook.ipynb
 api_llm/final_chromadb_database/
+*.bin
