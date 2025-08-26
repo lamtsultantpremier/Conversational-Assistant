@@ -122,7 +122,10 @@ if "messages" not in st.session_state:
 if "session_id" not in st.session_state:
      session_id = requests.post(f"{configs.BACKEND_URL}/sessions" , headers = headers).json()
      st.session_state["session_id"] = session_id
-     
+
+if "waiting" not in st.session_state:
+   st.session_state["waiting"]= False
+
 with st.sidebar:
          with st.form("my_conversation_form" , border = False):
             if st.form_submit_button(label = "Nouvelle Conversation" , icon="💬"):
@@ -181,23 +184,34 @@ with st.container():
                         {msg["content"]}
                       </div>""",unsafe_allow_html=True)
             
-      
-      prompt = st.chat_input(placeholder = "Comment puis-je vous aidez ? ")
+      #Afficage de l'input si uniquement on attend pas.
+      if not st.session_state["waiting"]:
+         prompt = st.chat_input(placeholder = "Comment puis-je vous aidez ? ")
+      else:
+         prompt = None
+
       if prompt:
          if "session_id" in st.session_state:
             with chat_placeholder:
                st.chat_message(name = "user" , avatar =  ":material/account_circle:").markdown(prompt)
                 
             user_message = {"session_id" : st.session_state["session_id"] , "role" : "user" , "content" : prompt}
-
-            chatbot_response = requests.post(f"{configs.BACKEND_URL}/messages" , json = user_message ,headers = headers).json()
-            
+             
             with chat_placeholder:
+               with st.status(label = "Melissa est en train de vous repondre......") as status:
+                     chatbot_response = requests.post(f"{configs.BACKEND_URL}/messages" , json = user_message ,headers = headers).json()
+                     status.update(label = "Reponse de Melissa ✅" , state = "complete")
+
+               #On attend la reponse de Melissa
+               st.session_state["waiting"] = True
+
                st.markdown(
                      f"""<div class="assistant-message">
                       {chatbot_response}
                        """, unsafe_allow_html=True)
-
+            #Ajoute la reponse à l'historique
             st.session_state["messages"].append({"role" : "user" , "content" : prompt})
             st.session_state["messages"].append({"role" : "assistant" , "content" : chatbot_response})
+
+            st.session_state["waiting"] = False
 

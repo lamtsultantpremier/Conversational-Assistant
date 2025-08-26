@@ -86,12 +86,14 @@ async def creacte_link(db: DbSession, url: Annotated[schemas.LinkCreate, Query()
 
 @app.post("/foncier/chats", tags=["RAG Chat with HISTORY "])
 async def rag_with_history(input: schemas.QuestionInput):
-    chain = retrieval_chain(
-        retriever=vectorstore.as_retriever(),
-        prompt_search_query=prompt_search_query,
-        prompt_get_answer=prompt_get_answer,
-        document_prompt=document_prompt,
-    )
+    # chain = retrieval_chain(
+    #     retriever=vectorstore.as_retriever(),
+    #     prompt_search_query=prompt_search_query,
+    #     prompt_get_answer=prompt_get_answer,
+    #     document_prompt=document_prompt,
+    # )
+    retriever = vectorstore.as_retriever()
+    chain = get_chain(prompt_get_answer , retriever)
     response = chain.invoke(
         {"chat_history": input.chat_history, "input": input.question}
     )
