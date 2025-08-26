@@ -208,3 +208,7 @@ __marimo__/
 
 api_llm/chroma_langchain_db/c849ae72-56df-4dac-bb9a-219f5cc675c1/length.bin
 api_llm/chroma_langchain_db/chroma.sqlite3
+api_llm/documents_pdf
+
+notebook.ipynb
+api_llm/final_chromadb_database/

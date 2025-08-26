@@ -33,14 +33,14 @@ def create_message(
     # La reponse contient toutes les reponses envoyés
     response = requests.post(configs.URL_API_LLM, json=payload).json()
 
-    response_answer = response["answer"]
+    #response_answer = response["answer"]
 
     llm_message = message_services.create_message(
         CreateMessage(
             session_id=user_message.session_id,
             role="assistant",
-            content=response_answer,
+            content=response,
         ),
         db,
     )
-    return response_answer
+    return response
